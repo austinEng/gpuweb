@@ -3894,6 +3894,24 @@ offset {{GPUOrigin3D}} in texels, used when copying data from or to a {{GPUTextu
     |textureCopyView|.{{GPUTextureCopyView/texture}}.
   - |textureCopyView|.{{GPUTextureCopyView/origin}}.[=Origin3D/x=] must be a multiple of |blockWidth|.
   - |textureCopyView|.{{GPUTextureCopyView/origin}}.[=Origin3D/y=] must be a multiple of |blockHeight|.
+  - [$validating GPUTextureCopyView aspect$](|textureCopyView|.{{GPUTextureCopyView/texture}}.{{GPUTexture/[[format]]}}, |textureCopyView|.{{GPUTextureCopyView/aspect}}) returns true.
+
+</div>
+
+<div algorithm class=validusage>
+<dfn abstract-op>validating GPUTextureCopyView aspect</dfn>
+
+  **Arguments:**
+    - {{GPUTextureFormat}} |format|
+    - {{GPUTextureAspect}} |aspect|
+
+  **Returns:** boolean
+
+  Return true if and only if exactly one of the following conditions apply:
+  - |aspect| is {{GPUTextureAspect/"all"}}.
+  - |aspect| is {{GPUTextureAspect/"depth-only"}} and |format| is {{GPUTextureAspect/"depth32float"}},
+    {{GPUTextureAspect/"depth24plus-stencil8"}}, or {{GPUTextureAspect/"depth24plus"}}.
+  - |aspect| is {{GPUTextureAspect/"stencil-only"}} and  |format| is {{GPUTextureAspect/"depth24plus-stencil8"}}.
 
 </div>
 
@@ -4102,6 +4120,9 @@ Given a {{GPUCommandEncoder}} |encoder| and the arguments {{GPUBufferCopyView}} 
   - |destination|.{{GPUTextureCopyView/texture}}.{{GPUTexture/[[textureUsage]]}} must contain
     {{GPUTextureUsage/COPY_DST}}.
   - |destination|.{{GPUTextureCopyView/texture}}.{{GPUTexture/[[sampleCount]]}} must be 1.
+  - If |destination|.{{GPUTextureCopyView/aspect}} is {{GPUTextureAspect/"all"}} or {{GPUTextureAspect/"depth-only"}},
+    |destination|.{{GPUTextureCopyView/texture}}.{{GPUTexture/[[format]]}} must be neither {{GPUTextureFormat/"depth24plus"}}
+    nor {{GPUTextureFormat/"depth24plus-stencil8"}} nor {{GPUTextureFormat/"depth32float"}}.
 
   For the copy ranges:
   - [$validating linear texture data$](|source|, |source|.{{GPUBufferCopyView/buffer}}.{{GPUBuffer/[[size]]}}, |destination|.{{GPUTextureCopyView/texture}}.{{GPUTexture/[[format]]}}, |copySize|) succeeds.
@@ -4144,6 +4165,9 @@ Given a {{GPUCommandEncoder}} |encoder| and the arguments {{GPUTextureCopyView}}
   - |source|.{{GPUTextureCopyView/texture}}.{{GPUTexture/[[textureUsage]]}} must contain
     {{GPUTextureUsage/COPY_SRC}}.
   - |source|.{{GPUTextureCopyView/texture}}.{{GPUTexture/[[sampleCount]]}} must be 1.
+  - If |source|.{{GPUTextureCopyView/aspect}} is {{GPUTextureAspect/"all"}} or {{GPUTextureAspect/"depth-only"}},
+    |source|.{{GPUTextureCopyView/texture}}.{{GPUTexture/[[format]]}} must be neither {{GPUTextureFormat/"depth24plus"}}
+    nor {{GPUTextureFormat/"depth24plus-stencil8"}}.
 
   For |destination|:
   - [$validating GPUBufferCopyView$](|destination|) returns true.
@@ -5112,7 +5136,7 @@ GPUQueue includes GPUObjectBase;
 
         - {{GPUQueue/copyImageBitmapToTexture(source, destination, copySize)/copySize}}.[=Extent3D/depth=] must be `1`.
         - {{GPUQueue/copyImageBitmapToTexture(source, destination, copySize)/destination}}.{{GPUTextureCopyView/texture}}.{{GPUTexture/[[format]]}} must be one of the following:
-             - {{GPUTextureFormat/"rgba8unorm"}} 
+             - {{GPUTextureFormat/"rgba8unorm"}}
              - {{GPUTextureFormat/"rgba8unorm-srgb"}}
              - {{GPUTextureFormat/"bgra8unorm"}}
              - {{GPUTextureFormat/"bgra8unorm-srgb"}}
